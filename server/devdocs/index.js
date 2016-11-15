@@ -18,7 +18,8 @@ import componentsUsageStats from 'devdocs/components-usage-stats.json';
 
 const root = fs.realpathSync( fspath.join( __dirname, '..', '..' ) ),
 	docsIndex = lunr.Index.load( searchIndex.index ),
-	documents = searchIndex.documents;
+	documents = searchIndex.documents,
+	selectors = require( './selectors' );
 
 /**
  * Constants
@@ -235,6 +236,18 @@ module.exports = function() {
 		const usageStats = reduceComponentsUsageStats( componentsUsageStats );
 		response.json( usageStats );
 	} );
+
+	// In environments where enabled, prime the selectors search cache whenever
+	// a request is made for DevDocs
+	app.use( '/devdocs', ( error, request, response, next ) => {
+		if ( ! error ) {
+			selectors.prime();
+		}
+
+		next( error );
+	} );
+
+	app.use( '/devdocs/service/selectors', selectors.router );
 
 	return app;
 };
