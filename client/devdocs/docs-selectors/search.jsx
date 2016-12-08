@@ -9,6 +9,7 @@ import { map } from 'lodash';
 /**
  * Internal dependencies
  */
+import EmptyContent from 'components/empty-content';
 import SearchCard from 'components/search-card';
 import { addQueryArgs } from 'lib/url';
 import DocsSelectorsResult from './result';
@@ -55,6 +56,11 @@ export default class DocsSelectorsSearch extends Component {
 					initialValue={ search }
 					delaySearch
 					onSearch={ this.onSearch } />
+				{ results && ! results.length && (
+					<EmptyContent
+						title="No selectors found"
+						line="Try another search query" />
+				) }
 				<ul className="docs-selectors__results">
 					{ map( results, ( { name, description, tags } ) => (
 						<li key={ name }>
