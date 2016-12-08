@@ -52,10 +52,10 @@ function prime() {
 		return;
 	}
 
-	prepareFuse = new Promise( ( resolve, reject ) => {
+	prepareFuse = new Promise( ( resolve ) => {
 		fs.readdir( SELECTORS_DIR, ( error, files ) => {
 			if ( error ) {
-				return reject( error );
+				files = [];
 			}
 
 			// Omit index, system files, and subdirectories
