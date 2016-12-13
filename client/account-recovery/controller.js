@@ -8,6 +8,7 @@ import page from 'page';
  * Internal dependencies
  */
 import LostPasswordPage from 'account-recovery/lost-password';
+import ResetPasswordPage from 'account-recovery/reset-password';
 import { getCurrentUser } from 'state/current-user/selectors';
 
 export function lostPassword( context, next ) {
@@ -22,6 +23,14 @@ export function redirectLoggedIn( context, next ) {
 		page.redirect( '/' );
 		return;
 	}
+
+	next();
+}
+
+export function resetPassword( context, next ) {
+	context.primary = <ResetPasswordPage basePath={ context.path } />;
+
+	//TODO: Redirect to LostPasswordPage if we don't have the correct state
 
 	next();
 }
