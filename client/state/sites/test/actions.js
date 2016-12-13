@@ -9,6 +9,7 @@ import { expect } from 'chai';
  */
 import useNock from 'test/helpers/use-nock';
 import {
+	SITE_ICON_SET,
 	SITE_FRONT_PAGE_SET,
 	SITE_FRONT_PAGE_SET_FAILURE,
 	SITE_FRONT_PAGE_SET_SUCCESS,
@@ -26,7 +27,9 @@ import {
 	receiveSites,
 	requestSites,
 	requestSite,
-	setFrontPage
+	setFrontPage,
+	setSiteIcon,
+	resetSiteIcon
 } from '../actions';
 
 import { useSandbox } from 'test/helpers/use-sinon';
@@ -230,6 +233,30 @@ describe( 'actions', () => {
 					pageId: 1,
 					error: match( { message: 'User cannot access this private blog.' } )
 				} );
+			} );
+		} );
+	} );
+
+	describe( 'setSiteIcon()', () => {
+		it( 'should return an action object', () => {
+			const action = setSiteIcon( 2916284, 'https://secure.gravatar.com/blavatar/dca162c4950d38afefdc4f785bc8a3f1' );
+
+			expect( action ).to.eql( {
+				type: SITE_ICON_SET,
+				siteId: 2916284,
+				iconUrl: 'https://secure.gravatar.com/blavatar/dca162c4950d38afefdc4f785bc8a3f1'
+			} );
+		} );
+	} );
+
+	describe( 'resetSiteIcon()', () => {
+		it( 'should return an action object', () => {
+			const action = resetSiteIcon( 2916284 );
+
+			expect( action ).to.eql( {
+				type: SITE_ICON_SET,
+				siteId: 2916284,
+				iconUrl: null
 			} );
 		} );
 	} );

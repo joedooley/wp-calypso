@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { combineReducers } from 'redux';
-import { pick, merge, get } from 'lodash';
+import { pick, merge, get, omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -128,8 +128,15 @@ export function items( state = {}, action ) {
 		case SITE_ICON_SET: {
 			const { siteId, iconUrl } = action;
 			const site = state[ siteId ];
-			if ( ! site || get( site.icon, 'img' ) === iconUrl ) {
+			if ( ! site || get( site.icon, 'img', null ) === iconUrl ) {
 				return state;
+			}
+
+			if ( null === iconUrl ) {
+				return {
+					...state,
+					[ siteId ]: omit( site, 'icon' )
+				};
 			}
 
 			return {

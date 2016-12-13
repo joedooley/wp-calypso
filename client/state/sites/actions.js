@@ -172,3 +172,14 @@ export function setSiteIcon( siteId, iconUrl ) {
 		iconUrl
 	};
 }
+
+/**
+ * Returns an action object used in signalling that a site's icon is to be
+ * removed.
+ *
+ * @param  {Number} siteId  Site ID
+ * @return {Object}         Action object
+ */
+export function resetSiteIcon( siteId ) {
+	return setSiteIcon( siteId, null );
+}

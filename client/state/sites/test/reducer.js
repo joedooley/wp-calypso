@@ -335,6 +335,47 @@ describe( 'reducer', () => {
 			} );
 		} );
 
+		it( 'should return same state on resetting icon if not currently set', () => {
+			const original = deepFreeze( {
+				2916284: {
+					ID: 2916284,
+					name: 'WordPress.com Example Blog'
+				}
+			} );
+			const state = items( original, {
+				type: SITE_ICON_SET,
+				siteId: 2916284,
+				iconUrl: null
+			} );
+
+			expect( state ).to.equal( original );
+		} );
+
+		it( 'should return updated state on resetting icon if set', () => {
+			const original = deepFreeze( {
+				2916284: {
+					ID: 2916284,
+					name: 'WordPress.com Example Blog',
+					icon: {
+						img: 'https://secure.gravatar.com/blavatar/dca162c4950d38afefdc4f785bc8a3f1',
+						ico: 'https://secure.gravatar.com/blavatar/dca162c4950d38afefdc4f785bc8a3f1'
+					}
+				}
+			} );
+			const state = items( original, {
+				type: SITE_ICON_SET,
+				siteId: 2916284,
+				iconUrl: null
+			} );
+
+			expect( state ).to.eql( {
+				2916284: {
+					ID: 2916284,
+					name: 'WordPress.com Example Blog'
+				}
+			} );
+		} );
+
 		it( 'should persist state', () => {
 			const original = deepFreeze( {
 				2916284: {
