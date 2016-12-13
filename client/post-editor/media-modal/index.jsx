@@ -5,7 +5,7 @@ var React = require( 'react' ),
 	closest = require( 'component-closest' ),
 	debug = require( 'debug' )( 'calypso:post-editor:media' );
 import { connect } from 'react-redux';
-import { noop, head, some, findIndex, partial, values } from 'lodash';
+import { noop, head, some, findIndex, partial, values, get, map, includes } from 'lodash';
 
 /**
  * Internal dependencies
@@ -19,11 +19,15 @@ var MediaLibrary = require( 'my-sites/media-library' ),
 	MediaUtils = require( 'lib/media/utils' ),
 	Dialog = require( 'components/dialog' ),
 	accept = require( 'lib/accept' );
+import QuerySiteSettings from 'components/data/query-site-settings';
 import { getMediaModalView } from 'state/ui/media-modal/selectors';
 import { getSite } from 'state/sites/selectors';
 import { resetMediaModalView } from 'state/ui/media-modal/actions';
 import { setEditorMediaModalView } from 'state/ui/editor/actions';
 import { ModalViews } from 'state/ui/media-modal/constants';
+import { deleteMedia } from 'state/media/actions';
+import { resetSiteIcon } from 'state/sites/actions';
+import { getSiteSetting } from 'state/site-settings/selectors';
 import ImageEditor from 'blocks/image-editor';
 import MediaModalDetail from './detail';
 
@@ -56,7 +60,9 @@ export const EditorMediaModal = React.createClass( {
 			setView: noop,
 			resetView: noop,
 			view: ModalViews.LIST,
-			imageEditorProps: {}
+			imageEditorProps: {},
+			deleteMedia: () => {},
+			resetSiteIcon: () => {}
 		};
 	},
 
@@ -134,7 +140,7 @@ export const EditorMediaModal = React.createClass( {
 	},
 
 	confirmDeleteMedia: function( accepted ) {
-		const { site, mediaLibrarySelectedItems } = this.props;
+		const { site, mediaLibrarySelectedItems, siteIconId } = this.props;
 
 		if ( ! site || ! accepted ) {
 			return;
@@ -148,6 +154,11 @@ export const EditorMediaModal = React.createClass( {
 
 		MediaActions.delete( site.ID, toDelete );
 		analytics.mc.bumpStat( 'editor_media_actions', 'delete_media' );
+		const mediaIds = map( toDelete, 'ID' );
+		this.props.deleteMedia( site.ID, mediaIds );
+		if ( includes( mediaIds, siteIconId ) ) {
+			this.props.resetSiteIcon( site.ID );
+		}
 	},
 
 	deleteMedia: function() {
@@ -429,13 +440,16 @@ export const EditorMediaModal = React.createClass( {
 	},
 
 	render: function() {
+		const { visible, site } = this.props;
+
 		return (
 			<Dialog
-				isVisible={ this.props.visible }
+				isVisible={ visible }
 				buttons={ this.getModalButtons() }
 				onClose={ this.onClose }
 				additionalClassNames="editor-media-modal"
 				onClickOutside={ this.preventClose }>
+				{ site && <QuerySiteSettings siteId={ site.ID } /> }
 				{ this.renderContent() }
 			</Dialog>
 		);
@@ -447,10 +461,13 @@ export default connect(
 		view: getMediaModalView( state ),
 		// [TODO]: Migrate toward dropping incoming site prop, accepting only
 		// siteId and forcing descendant components to access via state
-		site: site || getSite( state, siteId )
+		site: site || getSite( state, siteId ),
+		siteIconId: getSiteSetting( state, get( site, 'ID', siteId ), 'site_icon' )
 	} ),
 	{
 		setView: setEditorMediaModalView,
-		resetView: resetMediaModalView
+		resetView: resetMediaModalView,
+		deleteMedia,
+		resetSiteIcon
 	}
 )( EditorMediaModal );
