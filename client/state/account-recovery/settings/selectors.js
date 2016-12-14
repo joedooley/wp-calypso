@@ -20,6 +20,7 @@ export const getAccountRecoveryEmail = ( state ) => {
 
 export const getAccountRecoveryPhone = ( state ) => {
 	return isAccountRecoverySettingsReady( state ) ? getSettingsData( state ).phone : null;
+};
 
 export const isUpdatingAccountRecoveryPhone = ( state ) => {
 	return !! state.accountRecovery.settings.isUpdating.phone;
