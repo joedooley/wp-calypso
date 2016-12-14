@@ -18,17 +18,10 @@ import FormRadio from 'components/forms/form-radio';
 export class ResetPasswordFormComponent extends Component {
 	static defaultProps = {
 		translate: identity,
-		//The following default props are here for testing purposes only
-		primaryEmail: 'w*****1@y***o.com',
-		secondaryEmail: 'w***f@g***l.com',
-		phoneNumber: '+155******55',
 	};
 
 	static propTypes = {
 		translate: PropTypes.func.isRequired,
-		primaryEmail: PropTypes.string.isRequired,
-		secondaryEmail: PropTypes.string.isRequired,
-		phoneNumber: PropTypes.string.isRequired,
 	};
 
 	state = {
@@ -45,10 +38,7 @@ export class ResetPasswordFormComponent extends Component {
 	};
 
 	render() {
-		const {
-			primaryEmail, secondaryEmail, phoneNumber,
-			translate,
-		} = this.props;
+		const { translate } = this.props;
 		const { isSubmitting, selectedResetOption } = this.state;
 		const isPrimaryButtonEnabled = selectedResetOption && ! isSubmitting;
 
@@ -75,11 +65,8 @@ export class ResetPasswordFormComponent extends Component {
 								onChange={ this.onResetOptionChanged } />
 							<span>
 								{ translate(
-									'Email a reset link to {{strong}}%(emailAddress)s{{/strong}}',
-									{
-										args: {	emailAddress: primaryEmail },
-										components: { strong: <strong /> }
-									}
+									'Email a reset link to {{strong}}your main email address{{/strong}}',
+									{ components: { strong: <strong /> } }
 								) }
 							</span>
 						</FormLabel>
@@ -92,11 +79,8 @@ export class ResetPasswordFormComponent extends Component {
 								onChange={ this.onResetOptionChanged } />
 							<span>
 								{ translate(
-									'Email a reset link to {{strong}}%(emailAddress)s{{/strong}}',
-									{
-										args: {	emailAddress: secondaryEmail },
-										components: { strong: <strong /> }
-									}
+									'Email a reset link to {{strong}}your recovery email address{{/strong}}',
+									{ components: { strong: <strong /> } }
 								) }
 							</span>
 						</FormLabel>
@@ -109,11 +93,8 @@ export class ResetPasswordFormComponent extends Component {
 								onChange={ this.onResetOptionChanged } />
 							<span>
 								{ translate(
-									'Send a reset code to the phone number {{strong}}%(phoneNumber)s{{/strong}}',
-									{
-										args: {	phoneNumber },
-										components: { strong: <strong /> }
-									}
+									'Send a reset code to {{strong}}your phone{{/strong}}',
+									{ components: { strong: <strong /> } }
 								) }
 							</span>
 						</FormLabel>
