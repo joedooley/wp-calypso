@@ -13,6 +13,16 @@ describe( 'index', function() {
 		expect( safeImage( '/foo' ) ).to.eql( '/foo' );
 	} );
 
+	it( 'should ignore a data url', function() {
+		const dataImageUrl = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+		expect( safeImage( dataImageUrl ) ).to.equal( dataImageUrl );
+	} );
+
+	it( 'should ignore a blob url', function() {
+		const blobImageUrl = 'blob:http%3A//example.com/ddd1d6b0-f31b-4937-ae9e-97f1d660cf71';
+		expect( safeImage( blobImageUrl ) ).to.equal( blobImageUrl );
+	} );
+
 	it( 'should make a non-wpcom http url safe', function() {
 		expect( safeImage( 'http://example.com/foo' ) ).to.eql( 'https://i1.wp.com/example.com/foo' );
 	} );
