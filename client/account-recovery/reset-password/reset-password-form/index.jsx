@@ -55,7 +55,9 @@ export class ResetPasswordFormComponent extends Component {
 				</p>
 				<Card>
 					<FormFieldset className="reset-password-form__field-set">
-						<FormLegend className="reset-password-form__legend">How would you like to reset your password?</FormLegend>
+						<FormLegend className="reset-password-form__legend">
+							{ translate( 'How would you like to reset your password?' ) }
+						</FormLegend>
 						<FormLabel>
 							<FormRadio
 								className="reset-password-form__primary-email-option"
