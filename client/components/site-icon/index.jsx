@@ -3,14 +3,14 @@
  */
 import React from 'react';
 import { connect } from 'react-redux';
-import { includes } from 'lodash';
+import { get, includes } from 'lodash';
 import { parse as parseUrl } from 'url';
 import classNames from 'classnames';
 
 /**
  * Internal dependencies
  */
-import { getSite } from 'state/sites/selectors';
+import { getSite, getSiteIconUrl } from 'state/sites/selectors';
 import resizeImageUrl from 'lib/resize-image-url';
 import Gridicon from 'components/gridicon';
 
@@ -31,11 +31,16 @@ const SiteIcon = React.createClass( {
 		size: React.PropTypes.number
 	},
 
-	getIconSrcUrl( imageUrl ) {
-		const { host } = parseUrl( imageUrl, true, true );
+	getIconSrcUrl() {
+		const { iconUrl } = this.props;
+		if ( ! iconUrl ) {
+			return;
+		}
+
+		const { host } = parseUrl( iconUrl, true, true );
 		const sizeParam = includes( host, 'gravatar.com' ) ? 's' : 'w';
 
-		return resizeImageUrl( imageUrl, {
+		return resizeImageUrl( iconUrl, {
 			[ sizeParam ]: this.props.imgSize
 		} );
 	},
@@ -44,7 +49,7 @@ const SiteIcon = React.createClass( {
 		var iconSrc, iconClasses, style;
 
 		// Set the site icon path if it's available
-		iconSrc = ( this.props.site && this.props.site.icon ) ? this.getIconSrcUrl( this.props.site.icon.img ) : null;
+		iconSrc = this.getIconSrcUrl();
 
 		iconClasses = classNames( {
 			'site-icon': true,
@@ -70,6 +75,19 @@ const SiteIcon = React.createClass( {
 	}
 } );
 
-export default connect( ( state, { siteId } ) => (
-	siteId ? { site: getSite( state, siteId ) } : {}
-) )( SiteIcon );
+export default connect( ( state, { site, siteId, imgSize } ) => {
+	// Until sites state is completely within Redux, we provide compatibility
+	// in cases where site object is passed to use the icon.img property as URL
+	if ( site ) {
+		return {
+			iconUrl: get( site, 'icon.img' )
+		};
+	}
+
+	// Otherwise, assume we want to perform the lookup in Redux state
+	// exclusively using the site ID
+	return {
+		site: getSite( state, siteId ),
+		iconUrl: getSiteIconUrl( state, siteId, imgSize )
+	};
+} )( SiteIcon );

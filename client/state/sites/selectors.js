@@ -32,6 +32,7 @@ import { fromApi as seoTitleFromApi } from 'components/seo/meta-title-editor/map
 import versionCompare from 'lib/version-compare';
 import getComputedAttributes from 'lib/site/computed-attributes';
 import { PRESSABLE_STATE_TRANSFERED, PRESSABLE_STATE_IN_TRANSFER } from './constants';
+import { getMediaUrl } from 'state/media/selectors';
 
 /**
  * Returns a raw site object by its ID.
@@ -1020,3 +1021,25 @@ export const hasDefaultSiteTitle = ( state, siteId ) => {
 	// we are using startsWith here, as getSiteSlug returns "slug.wordpress.com"
 	return site.name === i18n.translate( 'Site Title' ) || startsWith( slug, site.name );
 };
+
+/**
+ * Returns a URL to the site's current site icon, or null if no icon exists or
+ * if site is not known
+ *
+ * @param  {Object}  state  Global state tree
+ * @param  {Number}  siteId Site ID
+ * @return {?String}        URL of site icon, if known and exists
+ */
+export function getSiteIconUrl( state, siteId ) {
+	const site = getRawSite( state, siteId );
+
+	// Try to find media URL associated with media ID on site object
+	const url = getMediaUrl( state, siteId, get( site, 'icon.media_id' ) );
+	if ( url ) {
+		return url;
+	}
+
+	// If cannot find media by ID, use icon.img property if available,
+	// otherwise assume icon is not set
+	return get( site, 'icon.img', null );
+}
