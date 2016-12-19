@@ -5,12 +5,24 @@ import photon from 'photon';
 import { parse as parseUrl } from 'url';
 
 /**
- * Pattern matching URLs to be left unmodified: relative URLs, inline images,
- * or local file URLs.
+ * Regular expression pattern strings to be used in exempting URLs by prefix:
+ * relative URLs, inline images, or local file URLs (in browser context).
  *
- * @type {Array}
+ * @type {String[]}
  */
-const REGEX_EXEMPT_URL = /^(\/(?!\/)|data:image\/[^;]+;|blob:)/;
+const safePrefixPatterns = [ '\/(?!\/)', 'data:image\/[^;]+;' ];
+if ( 'object' === typeof location ) {
+	// See: https://w3c.github.io/FileAPI/#blob-url
+	const { protocol, hostname, port } = location;
+	safePrefixPatterns.push( `blob:${ protocol }\/\/${ hostname }${ port ? ':' + port : '' }\/` );
+}
+
+/**
+ * Pattern matching URLs to be left unmodified.
+ *
+ * @type {RegExp}
+ */
+const REGEX_EXEMPT_URL = new RegExp( `^(${ safePrefixPatterns.join( '|' ) })` );
 
 /**
  * Pattern matching Automattic-controlled hostnames

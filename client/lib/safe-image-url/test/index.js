@@ -3,12 +3,12 @@
  */
 import { expect } from 'chai';
 
-/**
- * Internal Dependencies
- */
-import safeImageUrl from '../';
-
 describe( 'safeImageUrl()', () => {
+	let safeImageUrl;
+	before( () => {
+		safeImageUrl = require( '../' );
+	} );
+
 	it( 'should ignore a relative url', () => {
 		expect( safeImageUrl( '/foo' ) ).to.equal( '/foo' );
 	} );
@@ -18,9 +18,41 @@ describe( 'safeImageUrl()', () => {
 		expect( safeImageUrl( dataImageUrl ) ).to.equal( dataImageUrl );
 	} );
 
-	it( 'should ignore a blob url', () => {
-		const blobImageUrl = 'blob:http%3A//example.com/ddd1d6b0-f31b-4937-ae9e-97f1d660cf71';
-		expect( safeImageUrl( blobImageUrl ) ).to.equal( blobImageUrl );
+	context( 'browser', () => {
+		before( () => {
+			global.location = {
+				protocol: 'https:',
+				hostname: 'wordpress.com'
+			};
+
+			delete require.cache[ require.resolve( '../' ) ];
+			safeImageUrl = require( '../' );
+		} );
+
+		after( () => {
+			delete global.location;
+			delete require.cache[ require.resolve( '../' ) ];
+			safeImageUrl = require( '../' );
+		} );
+
+		it( 'should ignore a blob url for current origin', () => {
+			const originalUrl = 'blob:https://wordpress.com/ddd1d6b0-f31b-4937-ae9e-97f1d660cf71';
+			expect( safeImageUrl( originalUrl ) ).to.equal( originalUrl );
+		} );
+
+		it( 'should make a blob url for other origin safe', () => {
+			const originalUrl = 'blob:http://example.com/ddd1d6b0-f31b-4937-ae9e-97f1d660cf71';
+			const expectedUrl = 'https://i1.wp.com/http//example.com/ddd1d6b0-f31b-4937-ae9e-97f1d660cf71';
+			expect( safeImageUrl( originalUrl ) ).to.equal( expectedUrl );
+		} );
+	} );
+
+	context( 'node', () => {
+		it( 'should make a blob url safe', () => {
+			const originalUrl = 'blob:http://example.com/ddd1d6b0-f31b-4937-ae9e-97f1d660cf71';
+			const expectedUrl = 'https://i1.wp.com/http//example.com/ddd1d6b0-f31b-4937-ae9e-97f1d660cf71';
+			expect( safeImageUrl( originalUrl ) ).to.equal( expectedUrl );
+		} );
 	} );
 
 	it( 'should make a non-whitelisted protocol safe', () => {
