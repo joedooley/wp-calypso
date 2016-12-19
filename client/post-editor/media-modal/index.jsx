@@ -5,7 +5,7 @@ var React = require( 'react' ),
 	closest = require( 'component-closest' ),
 	debug = require( 'debug' )( 'calypso:post-editor:media' );
 import { connect } from 'react-redux';
-import { noop, head, some, findIndex, partial, values, get, map, includes } from 'lodash';
+import { noop, head, some, findIndex, partial, values, get, map } from 'lodash';
 
 /**
  * Internal dependencies
@@ -26,7 +26,6 @@ import { resetMediaModalView } from 'state/ui/media-modal/actions';
 import { setEditorMediaModalView } from 'state/ui/editor/actions';
 import { ModalViews } from 'state/ui/media-modal/constants';
 import { deleteMedia } from 'state/media/actions';
-import { resetSiteIcon } from 'state/sites/actions';
 import { getSiteSetting } from 'state/site-settings/selectors';
 import ImageEditor from 'blocks/image-editor';
 import MediaModalDetail from './detail';
@@ -61,8 +60,7 @@ export const EditorMediaModal = React.createClass( {
 			resetView: noop,
 			view: ModalViews.LIST,
 			imageEditorProps: {},
-			deleteMedia: () => {},
-			resetSiteIcon: () => {}
+			deleteMedia: () => {}
 		};
 	},
 
@@ -140,7 +138,7 @@ export const EditorMediaModal = React.createClass( {
 	},
 
 	confirmDeleteMedia: function( accepted ) {
-		const { site, mediaLibrarySelectedItems, siteIconId } = this.props;
+		const { site, mediaLibrarySelectedItems } = this.props;
 
 		if ( ! site || ! accepted ) {
 			return;
@@ -154,11 +152,7 @@ export const EditorMediaModal = React.createClass( {
 
 		MediaActions.delete( site.ID, toDelete );
 		analytics.mc.bumpStat( 'editor_media_actions', 'delete_media' );
-		const mediaIds = map( toDelete, 'ID' );
-		this.props.deleteMedia( site.ID, mediaIds );
-		if ( includes( mediaIds, siteIconId ) ) {
-			this.props.resetSiteIcon( site.ID );
-		}
+		this.props.deleteMedia( site.ID, map( toDelete, 'ID' ) );
 	},
 
 	deleteMedia: function() {
@@ -467,7 +461,6 @@ export default connect(
 	{
 		setView: setEditorMediaModalView,
 		resetView: resetMediaModalView,
-		deleteMedia,
-		resetSiteIcon
+		deleteMedia
 	}
 )( EditorMediaModal );

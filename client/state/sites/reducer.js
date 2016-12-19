@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { combineReducers } from 'redux';
-import { pick, merge, get, omit } from 'lodash';
+import { pick, omit, merge, get, includes } from 'lodash';
 
 /**
  * Internal dependencies
@@ -15,12 +15,14 @@ import updates from './updates/reducer';
 
 import mediaStorage from './media-storage/reducer';
 import {
+	MEDIA_DELETE,
 	SITE_FRONT_PAGE_SET_SUCCESS,
-	SITE_ICON_SET,
 	SITE_RECEIVE,
 	SITE_REQUEST,
 	SITE_REQUEST_FAILURE,
 	SITE_REQUEST_SUCCESS,
+	SITE_SETTINGS_RECEIVE,
+	SITE_SETTINGS_UPDATE,
 	SITES_RECEIVE,
 	SITES_REQUEST,
 	SITES_REQUEST_FAILURE,
@@ -125,29 +127,58 @@ export function items( state = {}, action ) {
 			};
 		}
 
-		case SITE_ICON_SET: {
-			const { siteId, iconUrl } = action;
-			const site = state[ siteId ];
-			if ( ! site || get( site.icon, 'img', null ) === iconUrl ) {
+		case SITE_SETTINGS_UPDATE:
+		case SITE_SETTINGS_RECEIVE: {
+			const { siteId, settings } = action;
+
+			// A site settings update may or may not include the icon property.
+			// If not, we should simply return state unchanged.
+			if ( ! settings.hasOwnProperty( 'site_icon' ) ) {
 				return state;
 			}
 
-			if ( null === iconUrl ) {
-				return {
-					...state,
-					[ siteId ]: omit( site, 'icon' )
+			const mediaId = settings.site_icon;
+
+			// Similarly, return unchanged if next icon matches current value,
+			// accounting for the fact that a non-existent icon property is
+			// equivalent to setting the media icon as null
+			const site = state[ siteId ];
+			if ( ! site || get( site.icon, 'media_id', null ) === mediaId ) {
+				return state;
+			}
+
+			let nextSite;
+			if ( null === mediaId ) {
+				// Unset icon
+				nextSite = omit( site, 'icon' );
+			} else {
+				// Update icon, intentionally removing reference to the URL,
+				// shifting burden of URL lookup to selector
+				nextSite = {
+					...site,
+					icon: {
+						media_id: mediaId
+					}
 				};
 			}
 
 			return {
 				...state,
-				[ siteId ]: merge( {}, site, {
-					icon: {
-						img: iconUrl,
-						ico: iconUrl
-					}
-				} )
+				[ siteId ]: nextSite
 			};
+		}
+
+		case MEDIA_DELETE: {
+			const { siteId, mediaIds } = action;
+			const siteIconId = get( state[ siteId ], 'icon.media_id' );
+			if ( siteIconId && includes( mediaIds, siteIconId ) ) {
+				return {
+					...state,
+					[ siteId ]: omit( state[ siteId ], 'icon' )
+				};
+			}
+
+			return state;
 		}
 
 		case DESERIALIZE:

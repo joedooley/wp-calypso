@@ -6,7 +6,6 @@ import {
 	SITE_FRONT_PAGE_SET,
 	SITE_FRONT_PAGE_SET_FAILURE,
 	SITE_FRONT_PAGE_SET_SUCCESS,
-	SITE_ICON_SET,
 	SITE_RECEIVE,
 	SITE_REQUEST,
 	SITE_REQUEST_FAILURE,
@@ -155,31 +154,4 @@ export function setFrontPage( siteId, pageId, successCallback ) {
 			} );
 		} );
 	};
-}
-
-/**
- * Returns an action object used in signalling that the icon for the site
- * should be assigned to the specified image URL.
- *
- * @param  {Number} siteId  Site ID
- * @param  {String} iconUrl Icon URL
- * @return {Object}         Action object
- */
-export function setSiteIcon( siteId, iconUrl ) {
-	return {
-		type: SITE_ICON_SET,
-		siteId,
-		iconUrl
-	};
-}
-
-/**
- * Returns an action object used in signalling that a site's icon is to be
- * removed.
- *
- * @param  {Number} siteId  Site ID
- * @return {Object}         Action object
- */
-export function resetSiteIcon( siteId ) {
-	return setSiteIcon( siteId, null );
 }
