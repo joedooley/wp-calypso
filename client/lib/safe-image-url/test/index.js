@@ -23,6 +23,12 @@ describe( 'safeImageUrl()', () => {
 		expect( safeImageUrl( blobImageUrl ) ).to.equal( blobImageUrl );
 	} );
 
+	it( 'should make a non-whitelisted protocol safe', () => {
+		[ 'javascript:alert("foo")', 'data:application/json;base64,', 'about:config' ].forEach( ( url ) => {
+			expect( safeImageUrl( url ) ).to.match( /^https:\/\/i[0-2]\.wp.com\// );
+		} );
+	} );
+
 	it( 'should make a non-wpcom http url safe', () => {
 		expect( safeImageUrl( 'http://example.com/foo' ) ).to.equal( 'https://i1.wp.com/example.com/foo' );
 	} );
@@ -37,10 +43,16 @@ describe( 'safeImageUrl()', () => {
 		);
 	} );
 
-	it( 'should make domain ending by wp-com url safe', () => {
-		expect( safeImageUrl( 'https://examplewordpress.com/foo' ) ).to.equal(
-			'https://i0.wp.com/examplewordpress.com/foo?ssl=1'
-		);
+	it( 'should make safe variations of urls testing extremes of safe patterns', () => {
+		expect( [
+			'https://examplewordpress.com/foo',
+			'https://wordpresscom/foo',
+			'https://wordpress.com.example.com/foo'
+		].map( safeImageUrl ) ).to.eql( [
+			'https://i0.wp.com/examplewordpress.com/foo?ssl=1',
+			'https://i0.wp.com/wordpresscom/foo?ssl=1',
+			'https://i0.wp.com/wordpress.com.example.com/foo?ssl=1'
+		] );
 	} );
 
 	it( 'should make a non-wpcom protocol relative url safe', () => {
