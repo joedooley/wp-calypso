@@ -2280,9 +2280,6 @@ describe( 'selectors', () => {
 				sites: {
 					items: {}
 				},
-				siteSettings: {
-					items: {}
-				},
 				media: {
 					items: {}
 				}

@@ -9,8 +9,7 @@ import { expect } from 'chai';
 import {
 	isRequestingSiteSettings,
 	isSavingSiteSettings,
-	getSiteSettings,
-	getSiteSetting
+	getSiteSettings
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -121,34 +120,6 @@ describe( 'selectors', () => {
 			const settings = getSiteSettings( state, 2916284 );
 
 			expect( settings ).to.eql( { default_category: 'chicken' } );
-		} );
-	} );
-
-	describe( 'getSiteSetting()', () => {
-		it( 'should return null if the setting is not known', () => {
-			const state = {
-				siteSettings: {
-					items: {}
-				}
-			};
-			const setting = getSiteSetting( state, 2916284, 'site_icon' );
-
-			expect( setting ).to.be.null;
-		} );
-
-		it( 'should return the setting if known', () => {
-			const state = {
-				siteSettings: {
-					items: {
-						2916284: {
-							site_icon: 42
-						}
-					}
-				}
-			};
-			const setting = getSiteSetting( state, 2916284, 'site_icon' );
-
-			expect( setting ).to.equal( 42 );
 		} );
 	} );
 } );

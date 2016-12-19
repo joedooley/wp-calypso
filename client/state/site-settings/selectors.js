@@ -35,15 +35,3 @@ export function isSavingSiteSettings( state, siteId ) {
 export function getSiteSettings( state, siteId ) {
 	return get( state.siteSettings.items, [ siteId ], null );
 }
-
-/**
- * Returns a setting for the specified site, or null if not known.
- *
- * @param  {Object} state   Global state tree
- * @param  {Number} siteId  Site ID
- * @param  {String} setting Setting name
- * @return {*}              Site settings, if known
- */
-export function getSiteSetting( state, siteId, setting ) {
-	return get( getSiteSettings( state, siteId ), setting, null );
-}
