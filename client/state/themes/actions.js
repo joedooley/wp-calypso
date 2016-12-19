@@ -424,7 +424,7 @@ export function activateWpcomThemeOnJetpack( themeId, siteId, source = 'unknown'
 		// Thus, we want to trigger any UI changes that apply to activation here, too.
 		dispatch( {
 			type: THEME_ACTIVATE_REQUEST,
-			suffixedThemeId,
+			themeId: suffixedThemeId,
 			siteId,
 		} );
 		dispatch( installTheme( suffixedThemeId, siteId ) )
@@ -434,7 +434,7 @@ export function activateWpcomThemeOnJetpack( themeId, siteId, source = 'unknown'
 			.catch( () => {
 				dispatch( {
 					type: THEME_ACTIVATE_REQUEST_FAILURE,
-					suffixedThemeId,
+					themeId: suffixedThemeId,
 					siteId,
 				} );
 			} );
